@@ -9,8 +9,8 @@ export const setCookie = (minutes,name,value) => {
     }
 }
 
-export const getCookie = (name) => {
-    var name = name + "=";
+export const getCookie = (Name) => {
+    var name = Name + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
     for (var i = 0; i < ca.length; i++) {

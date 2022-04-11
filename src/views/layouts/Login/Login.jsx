@@ -3,18 +3,16 @@ import { getValidator, rules } from '../../../global/validator_rules';
 import { getCookie, setCookie } from '../../../global/cookie';
 import config from "../../../config.json";
 import { LogIn } from "../../../services/Authorization";
-import { useDispatch } from "react-redux";
-import { setToken } from "../../../actions/profile";
 import { withRouter } from "react-router-dom";
 import './Login.css';
+import axios from "axios";
 
-const Login = ({ history, relogin = false }) => {
+const Login = ({ history, update = null, relogin = false }) => {
     const [username, Setusername] = useState("");
     const [password, Setpassword] = useState("");
     const [show, setShow] = useState(false);
     const [forceUpdate, setForceUpdate] = useState(false);
     const validator = useRef(getValidator);
-    const dispatch = useDispatch();
     const handelSubmit = async (event) => {
         event.preventDefault();
         const obj = {
@@ -25,17 +23,17 @@ const Login = ({ history, relogin = false }) => {
             try {
                 const respons = await LogIn(obj);
                 if (respons.data.statusText === "ok") {
-                    const time = 1;
-                    setCookie(time, 'token', respons.data.token);
-                    await dispatch(setToken(respons.data.token));
-                    setTimeout(() => {
-                        document.getElementById('Modal_RelogIn_open').click();
-                    }, (time * 60 * 1000));
+                    const token = respons.data.token;
+                    await setCookie(config.timeOut, 'token', token);
+                    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
                     if (relogin) {
                         document.getElementById('Modal_RelogIn_open').click();
                     } else {
                         history.replace(config.web_url);
+                        update();
                     }
+
                 } else {
                     setShow(true);
                 }
@@ -47,7 +45,7 @@ const Login = ({ history, relogin = false }) => {
         }
     };
     useEffect(() => {
-        if (getCookie('token') === null) {
+        if (relogin === false && getCookie('token') === null) {
             history.replace(config.web_url + "logIn");
         }
     }, []);

@@ -4,6 +4,7 @@ import { setProfileData } from "../../../actions/profile";
 import { _personProfile } from './../../../services/Person';
 import ContentWrapper from '../partials/ContentWrapper';
 import Sidebar from '../partials/Sidebar';
+import config from "../../../config.json";
 
 const ContentAndSidebar = () => {
 
@@ -22,7 +23,15 @@ const ContentAndSidebar = () => {
         }
     }
     useEffect(() => {
+        var timeout = setTimeout(() => {
+            if (document.getElementById('Modal_RelogIn_open') != null && document.getElementById('Modal_RelogIn_open') !== undefined) {
+                document.getElementById('Modal_RelogIn_open').click();
+            }
+        }, (config.timeOut * 60 * 1000));
         PersonProfile();
+        return () => {
+            clearTimeout(timeout);
+        };
     }, []);
     if (show) {
         return (
