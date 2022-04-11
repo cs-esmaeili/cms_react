@@ -1,20 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import { getValidator, rules } from '../../../global/validator_rules';
+import { LogInSchema } from '../../../global/validator_Schemas';
 import { getCookie, setCookie } from '../../../global/cookie';
 import config from "../../../config.json";
 import { LogIn } from "../../../services/Authorization";
 import { withRouter } from "react-router-dom";
+import { Formik, Form, Field } from 'formik';
 import './Login.css';
 import axios from "axios";
 
 const Login = ({ history, update = null, relogin = false }) => {
-    const [username, Setusername] = useState("");
-    const [password, Setpassword] = useState("");
     const [show, setShow] = useState(false);
     const [forceUpdate, setForceUpdate] = useState(false);
     const validator = useRef(getValidator);
-    const handelSubmit = async (event) => {
-        event.preventDefault();
+    const handelSubmit = async ({ username, password }) => {
         const obj = {
             username,
             password,
@@ -56,51 +55,43 @@ const Login = ({ history, update = null, relogin = false }) => {
                     <div className="card mb-4 py-3 border-bottom-danger">
                         <div className="card-body test">
                             <img className="img-fluid" src={config.logo_url} alt="cant load" style={{ borderRadius: "50%", padding: "inherit" }} />
-                            <form className="user" onSubmit={handelSubmit} >
-                                <div className="form-group">
-                                    <input className="form-control form-control-user" placeholder="نام کاربری"
-                                        value={username}
-                                        onChange={(e) => {
-                                            Setusername(e.target.value);
-                                            setShow(false);
-                                            validator.current.showMessageFor(
-                                                "username"
-                                            );
-                                        }}
-                                    />
-                                    {validator.current.message(
-                                        "username",
-                                        username,
-                                        rules('username')
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <input type="password" className="form-control form-control-user" id="exampleInputPassword"
-                                        placeholder="رمز عبور"
-                                        value={password}
-                                        onChange={(e) => {
-                                            Setpassword(e.target.value);
-                                            setShow(false);
-                                            validator.current.showMessageFor(
-                                                "password"
-                                            );
-                                        }}
-                                    />
-                                    {validator.current.message(
-                                        "password",
-                                        password,
-                                        rules('password')
-                                    )}
-                                </div>
-                                {show &&
-                                    <div className="alert alert-danger" role="alert" style={{ textAlign: "center" }}>
-                                        نام کاربری یا رمز عبور اشتباه است
-                                    </div>
-                                }
-                                <button type="submit" className="btn btn-primary btn-user btn-block">
-                                    ورود
-                                </button>
-                            </form>
+                            <Formik
+                                initialValues={{
+                                    username: '',
+                                    password: '',
+                                }}
+                                validationSchema={LogInSchema}
+                                onSubmit={values => {
+                                    handelSubmit(values);
+                                }}
+                            >
+                                {({ errors, touched }) => (
+                                    <Form onChange={() => { setShow(false) }}>
+                                        <div className="form-group">
+                                            <Field className="form-control form-control-user" name="username" placeholder="نام کاربری"
+                                            />
+                                            {errors.username && touched.username ? (
+                                                <div>{errors.username}</div>
+                                            ) : null}
+                                        </div>
+                                        <div className="form-group">
+                                            <Field className="form-control form-control-user" name="password" placeholder="رمز عبور"
+                                            />
+                                            {errors.password && touched.password ? (
+                                                <div>{errors.password}</div>
+                                            ) : null}
+                                        </div>
+                                        {show &&
+                                            <div className="alert alert-danger" role="alert" style={{ textAlign: "center" }}>
+                                                نام کاربری یا رمز عبور اشتباه است
+                                            </div>
+                                        }
+                                        <button type="submit" className="btn btn-primary btn-user btn-block">
+                                            ورود
+                                        </button>
+                                    </Form>
+                                )}
+                            </Formik>
                         </div>
                     </div>
                 </div>

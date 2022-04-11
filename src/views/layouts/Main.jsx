@@ -73,8 +73,8 @@ const Main = () => {
                 </div>
             }
             {(check === false) &&
-                // <Login update={() => setUpdate(!update)} />
-                <Test />
+                <Login update={() => setUpdate(!update)} />
+                // <Test />
             }
         </>
     )

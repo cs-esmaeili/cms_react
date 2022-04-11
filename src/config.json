@@ -4,5 +4,5 @@
     "api_url": "http://localhost/shopv2/api/admin/",
     "web_url": "/panel/",
     "logo_url": "http://localhost/shopv2/system/logo.png",
-    "timeOut": 1
+    "timeOut": 20
 }
