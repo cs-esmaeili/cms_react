@@ -8,7 +8,8 @@ const messages = (item, value = null) => {
         accepted: "فایل انتخاب نشده است",
         email: "فرمت وارد شده ایمیل نمی باشد",
         moreThan: `مقدار این فیلد باید بیشتر از فیلد ${value} باشد`,
-        imageRequired: 'باید تصویری انتخاب شود'
+        imageRequired: 'باید تصویری انتخاب شود',
+        selectRequired: 'باید یکی از گزینه ها انتخاب شود'
     }
     return temp[item];
 }
@@ -45,6 +46,7 @@ export const createProductSchema = Yup.object().shape({
         .positive()
         .min(1, messages('min', 1))
         .required(messages('required')),
-    file: Yup.boolean().oneOf([true], messages('imageRequired'))
+    file: Yup.boolean().oneOf([true], messages('imageRequired')),
+    category_id: Yup.boolean().oneOf([true], messages('selectRequired')),
 
 });

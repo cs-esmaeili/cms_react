@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { getCookie } from "../../global/cookie";
 import Login from "./Login/Login";
-import Test from "./Login/Test";
 import Logout from "../components/modals/Logout";
 import ContentAndSidebar from "./partials/ContentAndSidebar";
 import RelogIn from './../components/modals/RelogIn';
 import { CheckToken } from "../../services/Authorization";
+
 
 
 const Main = () => {
@@ -74,7 +74,6 @@ const Main = () => {
             }
             {(check === false) &&
                 <Login update={() => setUpdate(!update)} />
-                // <Test />
             }
         </>
     )

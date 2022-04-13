@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import FileMove from './../components/modals/FileMove';
 import FileRename from '../components/modals/FileRename';
 
-const FileManager = () => {
+const FileManager = ({ selectMode = null, data = null }) => {
 
     const [currentFolderFiles, setCurrentFolderFiles] = useState(null);
     const [currentPath, setCurrentPath] = useState("/");
@@ -20,7 +20,7 @@ const FileManager = () => {
     const publicFolderFiles = async (path) => {
         try {
             const data = {
-                path: path,
+                path,
             };
             const respons = await _publicFolderFilesLinks(data);
             if (respons.data.statusText === "ok") {
@@ -101,6 +101,29 @@ const FileManager = () => {
         } catch (error) { }
     }
 
+    const handelSelect = async () => {
+        if (selectMode === 'folder') {
+            try {
+                const obj = {
+                    path: currentPath + selectedItems[0] + '/',
+                };
+                console.log(obj);
+                const respons = await _publicFolderFilesLinks(obj);
+                if (respons.data.statusText === "ok") {
+                    data({ folder: selectedItems, files: respons.data.list });
+                    document.getElementById('Modal_FileManager_Folder_open').click();
+                } else {
+                    toast(respons.data.message);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        } else {
+            data(selectedItems);
+            document.getElementById('Modal_FileManager_Folder_open').click();
+        }
+    }
+
     useEffect(() => {
         publicFolderFiles(currentPath);
     }, []);
@@ -122,12 +145,15 @@ const FileManager = () => {
                 <FileRename old_name={(selectedItems != null) ? selectedItems[0] : ""} path={currentPath} reloadMethod={() => publicFolderFiles(currentPath)} />
                 <div className="shadow p-3 mb-5 bg-white rounded">
                     <div className="row">
-                        <input className="form-control" id="path" defaultValue={currentPath} onKeyDown={(e) => {
+                        <input className="form-control" id="path"  value={currentPath} onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                                 setCurrentPath(e.target.value);
                                 publicFolderFiles(e.target.value);
                             }
-                        }} />
+                        }}
+                        onChange={(e) =>{
+                            setCurrentPath(e.target.value);
+                        }}/>
                     </div>
                     <div className="row">
                         <i className="fas fa-home m-2 customHover noSelect" style={{ cursor: "pointer" }} onClick={() => { setCurrentPath('/'); publicFolderFiles('/'); }}> Home </i>
@@ -146,24 +172,29 @@ const FileManager = () => {
                         <i className="fas fa-sync-alt m-2 customHover noSelect" style={{ cursor: "pointer" }} onClick={() => {
                             publicFolderFiles(currentPath);
                         }}> Reload </i>
-                        <i className="far fa-square m-2 customHover noSelect" style={{ cursor: "pointer" }} onClick={() => {
-                            setSlectedItems(null);
-                        }}> Unselect All </i>
-                        <i className="far fa-check-square m-2 customHover noSelect" style={{ cursor: "pointer" }} onClick={() => {
-                            let files = document.querySelector('.listFiles').querySelectorAll('div');
-                            let items = [];
-                            for (let i = 0; i < files.length; i++) {
-                                if (files[i].querySelector('div') !== null) {
-                                    if (files[i].querySelector('div').innerHTML.includes(".")) {
-                                        items.push(files[i].querySelector('div').innerHTML);
-                                    } else {
-                                        items.push(files[i].querySelector('div').innerHTML);
-                                    }
-                                }
-                            }
+                        {(selectMode === null) &&
+                            <>
+                                <i className="far fa-square m-2 customHover noSelect" style={{ cursor: "pointer" }} onClick={() => {
+                                    setSlectedItems(null);
+                                }}> Unselect All </i>
 
-                            setSlectedItems(items);
-                        }}> Select All </i>
+                                <i className="far fa-check-square m-2 customHover noSelect" style={{ cursor: "pointer" }} onClick={() => {
+                                    let files = document.querySelector('.listFiles').querySelectorAll('div');
+                                    let items = [];
+                                    for (let i = 0; i < files.length; i++) {
+                                        if (files[i].querySelector('div') !== null) {
+                                            if (files[i].querySelector('div').innerHTML.includes(".")) {
+                                                items.push(files[i].querySelector('div').innerHTML);
+                                            } else {
+                                                items.push(files[i].querySelector('div').innerHTML);
+                                            }
+                                        }
+                                    }
+
+                                    setSlectedItems(items);
+                                }}> Select All </i>
+                            </>
+                        }
                         <i className="fa fa-trash m-2 customHover noSelect" style={(selectedItems === null) ? { pointerEvents: 'none' } : { cursor: "pointer" }} onClick={() => {
                             if (selectedItems !== null) {
                                 deleteFilesAndFolder();
@@ -208,6 +239,7 @@ const FileManager = () => {
                     }
                     {currentFolderFiles != null && currentFolderFiles !== "location is empty" &&
                         currentFolderFiles.map((value, index) => {
+
                             return (
                                 <div
                                     draggable="true"
@@ -223,28 +255,31 @@ const FileManager = () => {
                                     key={generateID()}
                                     onClick={(e) => {
                                         ignore = false;
-                                        timer = setTimeout(() => {
-                                            if (ignore === false) {
-                                                if (e.shiftKey) {
-                                                    if (selectedItems != null && selectedItems.includes(value.name)) {
-                                                        let index = selectedItems.indexOf(value.name);
-                                                        if (index !== -1) {
-                                                            selectedItems.splice(index, 1);
-                                                            setSlectedItems([...selectedItems]);
+                                        if ((selectMode === 'file' && value.name.includes('.'))
+                                            || (selectMode === 'folder' && !value.name.includes('.'))
+                                            || selectMode == null) {
+                                            timer = setTimeout(() => {
+                                                if (ignore === false) {
+                                                    if (e.shiftKey && selectMode === null) {
+                                                        if (selectedItems != null && selectedItems.includes(value.name)) {
+                                                            let index = selectedItems.indexOf(value.name);
+                                                            if (index !== -1) {
+                                                                selectedItems.splice(index, 1);
+                                                                setSlectedItems([...selectedItems]);
+                                                            }
+                                                        } else {
+                                                            if (selectedItems == null) {
+                                                                setSlectedItems(new Array(value.name));
+                                                            } else {
+                                                                setSlectedItems([...selectedItems, value.name]);
+                                                            }
                                                         }
                                                     } else {
-                                                        if (selectedItems == null) {
-                                                            setSlectedItems(new Array(value.name));
-                                                        } else {
-                                                            setSlectedItems([...selectedItems, value.name]);
-                                                        }
+                                                        setSlectedItems(new Array(value.name));
                                                     }
-                                                } else {
-                                                    setSlectedItems(new Array(value.name));
                                                 }
-                                                console.log(selectedItems);
-                                            }
-                                        }, 200);
+                                            }, 200);
+                                        }
                                     }}
                                     onDoubleClick={(e) => {
                                         clearTimeout(timer);
@@ -276,6 +311,11 @@ const FileManager = () => {
                                 </div>
                             );
                         })
+                    }
+                    {(selectMode !== null) &&
+                        <button className="btn btn-primary btn-user btn-block" onClick={handelSelect}>
+                            انتخاب
+                        </button>
                     }
                 </div>
             </>
