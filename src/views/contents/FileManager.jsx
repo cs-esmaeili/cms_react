@@ -37,7 +37,6 @@ const FileManager = ({ selectMode = null, data = null }) => {
                 path: currentPath,
                 list: selectedItems,
             };
-            console.log(data);
             const respons = await _deletePublicFolderOrFile(data);
             if (respons.data.statusText === "ok") {
                 publicFolderFiles(currentPath);
@@ -107,10 +106,10 @@ const FileManager = ({ selectMode = null, data = null }) => {
                 const obj = {
                     path: currentPath + selectedItems[0] + '/',
                 };
-                console.log(obj);
+
                 const respons = await _publicFolderFilesLinks(obj);
                 if (respons.data.statusText === "ok") {
-                    data({ folder: selectedItems, files: respons.data.list });
+                    data({ folder: selectedItems[0], foler_path: currentPath + selectedItems[0] + '/', files: respons.data.list });
                     document.getElementById('Modal_FileManager_Folder_open').click();
                 } else {
                     toast(respons.data.message);
@@ -119,7 +118,7 @@ const FileManager = ({ selectMode = null, data = null }) => {
                 console.log(error);
             }
         } else {
-            data(selectedItems);
+            data({ foler_path: currentPath + selectedItems[0] + '/', file: selectedItems[0] });
             document.getElementById('Modal_FileManager_Folder_open').click();
         }
     }
@@ -145,15 +144,15 @@ const FileManager = ({ selectMode = null, data = null }) => {
                 <FileRename old_name={(selectedItems != null) ? selectedItems[0] : ""} path={currentPath} reloadMethod={() => publicFolderFiles(currentPath)} />
                 <div className="shadow p-3 mb-5 bg-white rounded">
                     <div className="row">
-                        <input className="form-control" id="path"  value={currentPath} onKeyDown={(e) => {
+                        <input className="form-control" id="path" value={currentPath} onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                                 setCurrentPath(e.target.value);
                                 publicFolderFiles(e.target.value);
                             }
                         }}
-                        onChange={(e) =>{
-                            setCurrentPath(e.target.value);
-                        }}/>
+                            onChange={(e) => {
+                                setCurrentPath(e.target.value);
+                            }} />
                     </div>
                     <div className="row">
                         <i className="fas fa-home m-2 customHover noSelect" style={{ cursor: "pointer" }} onClick={() => { setCurrentPath('/'); publicFolderFiles('/'); }}> Home </i>
@@ -313,7 +312,7 @@ const FileManager = ({ selectMode = null, data = null }) => {
                         })
                     }
                     {(selectMode !== null) &&
-                        <button className="btn btn-primary btn-user btn-block" onClick={handelSelect}>
+                        <button className="btn btn-primary btn-user btn-block" onClick={() => handelSelect()}>
                             انتخاب
                         </button>
                     }

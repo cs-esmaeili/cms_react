@@ -2,11 +2,7 @@ import http from "./httpServices";
 import config from "../config.json";
 
 export const _CreateProduct = (data) => {
-    return http.post(`${config.api_url}createproduct`, data, {
-        headers: {
-            "Action": "createProduct",
-        }
-    });
+    return http.post(`${config.api_url}createProduct`, data);
 };
 export const _ProductList = () => {
     return http.post(`${config.api_url}productlist`, {}, {
