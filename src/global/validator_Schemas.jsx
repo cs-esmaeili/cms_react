@@ -35,13 +35,13 @@ export const createProductSchema = Yup.object().shape({
         .positive()
         .min(2, messages('min', 2))
         .max(999999999999, messages('max', 12))
-        .required(messages('required')),
+        .required(messages('required'))
+        .moreThan(Yup.ref("productSalePrice"), messages('moreThan', 'قیمت فروش کالا')),
     productSalePrice: Yup.number()
         .positive()
         .min(2, messages('min', 2))
         .max(999999999999, messages('max', 12))
-        .required(messages('required'))
-        .moreThan(Yup.ref("productPrice"), messages('moreThan', 'قیمت کالا')),
+        .required(messages('required')),
     stock: Yup.number()
         .positive()
         .min(1, messages('min', 1))

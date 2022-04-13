@@ -13,6 +13,7 @@ import PermissionDenid from './../../components/modals/PermissionDenid';
 import PostList from './../../contents/PostList';
 import SiteIndex from './../../contents/SiteIndex';
 import CreateProduct from './../../contents/CreateProduct';
+import ProductList from './../../contents/ProductList';
 
 const ContentWrapper = () => {
     return (
@@ -43,8 +44,11 @@ const ContentWrapper = () => {
                         <Route path={[config.web_url + "admins"]}>
                             <Admins />
                         </Route>
-                        <Route path={[config.web_url + "CreateProduct"]}>
+                        <Route path={[config.web_url + "createProduct"]}>
                             <CreateProduct />
+                        </Route>
+                        <Route path={[config.web_url + "productList"]}>
+                            <ProductList />
                         </Route>
                         <Route path={[config.web_url]}>
                             <Redirect to={config.web_url} />

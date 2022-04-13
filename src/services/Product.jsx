@@ -5,19 +5,11 @@ export const _CreateProduct = (data) => {
     return http.post(`${config.api_url}createProduct`, data);
 };
 export const _ProductList = () => {
-    return http.post(`${config.api_url}productlist`, {}, {
-        headers: {
-            "Action": "productList",
-        }
-    });
+    return http.post(`${config.api_url}productList`);
 };
 
 export const _DeleteProduct = (data) => {
-    return http.post(`${config.api_url}deleteproduct`, JSON.stringify(data), {
-        headers: {
-            "Action": "deleteProduct",
-        }
-    });
+    return http.post(`${config.api_url}deleteProduct`, JSON.stringify(data));
 };
 
 export const _EditProductInfo = (data) => {

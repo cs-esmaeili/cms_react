@@ -131,7 +131,7 @@ const Sidebar = () => {
                             {permission.includes('createPost_page') &&
                                 <Link
                                     className="collapse-item"
-                                    to={config.web_url + "CreateProduct"}
+                                    to={config.web_url + "createProduct"}
                                 >
                                     افزودن کالا
                                 </Link>
@@ -139,7 +139,7 @@ const Sidebar = () => {
                             {permission.includes('postList_page') &&
                                 <Link
                                     className="collapse-item"
-                                    to={config.web_url + "postList"}
+                                    to={config.web_url + "productList"}
                                 >
                                     لیست کالا ها
                                </Link>
