@@ -6,7 +6,7 @@ import { createProductSchema } from '../../global/validator_Schemas';
 import SelectFolder from './../components/modals/SelectFolder';
 import { toast } from 'react-toastify';
 import { _CreateProduct } from './../../services/Product';
-import { values } from 'lodash';
+import { _publicFolderFilesLinks } from '../../services/FileManager';
 
 const CreateProduct = ({ edit = false, data = null, onSubmit = null }) => {
 
@@ -29,34 +29,60 @@ const CreateProduct = ({ edit = false, data = null, onSubmit = null }) => {
 
     const handelSubmit = async (values, reset) => {
         const obj = {
-            category_id: values.category_id,
+            category_id: category_id,
             name: values.productName,
             price: values.productPrice,
             sale_price: values.productSalePrice,
             status: status,
             stock: values.stock,
             description: values.description,
-            image_folder: images.foler_path
+            image_folder: images.foler_path,
+            product_id: -1,
         }
+        if (edit) {
+            if (images.foler_path === undefined) {
+                delete obj.image_folder;
+            }
+            obj.product_id = data.product_id;
+        }
+
         try {
             const respons = await _CreateProduct(obj);
-            console.log(respons);
             if (respons.data.statusText === "ok") {
                 reset();
                 setImages(null);
                 setStatus(0);
             }
             toast(respons.data.message);
+            if (edit) {
+                onSubmit();
+            }
         } catch (error) {
             console.log(error);
         }
     }
+
+    const publicFolderFiles = async (path) => {
+        try {
+            const data = {
+                path,
+            };
+            const respons = await _publicFolderFilesLinks(data);
+            if (respons.data.statusText === "ok") {
+                setImages(respons.data.list);
+            } else {
+                toast(respons.data.message);
+            }
+        } catch (error) { }
+    }
+
 
     useEffect(() => {
         getCtegorysPure();
         if (edit) {
             setCategory_id((edit) ? data.category_id : null);
             setCategoryPure(null);
+            publicFolderFiles(data.image_folder);
         }
     }, [data]);
 
@@ -69,13 +95,13 @@ const CreateProduct = ({ edit = false, data = null, onSubmit = null }) => {
             }} />
             <Formik
                 initialValues={{
-                    productName: '',
-                    productPrice: '',
-                    productSalePrice: '',
-                    stock: '',
-                    description: '',
-                    file: false,
-                    category_id: false,
+                    productName: (edit) ? data.name : '',
+                    productPrice: (edit) ? data.price : '',
+                    productSalePrice: (edit) ? data.sale_price : '',
+                    stock: (edit) ? data.stock : '',
+                    description: (edit) ? data.description : '',
+                    file: (edit) ? true : false,
+                    category_id: (edit) ? true : false,
                 }}
                 validationSchema={createProductSchema}
                 onSubmit={(values, { resetForm }) => {
@@ -84,7 +110,6 @@ const CreateProduct = ({ edit = false, data = null, onSubmit = null }) => {
             >
                 {({ errors, touched, values, setFieldValue }) => (
                     <Form>
-                        {console.log(errors)}
                         <div className="row">
                             <div className='col'>
                                 <div className="card shadow">
@@ -93,7 +118,7 @@ const CreateProduct = ({ edit = false, data = null, onSubmit = null }) => {
                                     </div>
                                     <div className="card-body" >
                                         <div className='row' style={{ display: "flex", flexDirection: "row-reverse" }}>
-                                            {images != null && images.files.map((value, index) => {
+                                            {images != null && images.hasOwnProperty('files') && Array.isArray(images.files) && images.files.map((value, index) => {
                                                 return (
                                                     <div className='col-xxl-1 col-xl-2 col-lg-4 col-md-5 col-sm-6 col-xs-6' >
                                                         <label htmlFor={`file-upload-${index}`} className="custom-file-upload" style={{
@@ -105,14 +130,25 @@ const CreateProduct = ({ edit = false, data = null, onSubmit = null }) => {
                                                         </label>
                                                     </div>
                                                 )
-                                            })
-                                            }
+                                            })}
+                                            {edit && images != null && Array.isArray(images) && images.map((value, index) => {
+                                                return (
+                                                    <div className='col-xxl-1 col-xl-2 col-lg-4 col-md-5 col-sm-6 col-xs-6' >
+                                                        <label htmlFor={`file-upload-${index}`} className="custom-file-upload" style={{
+                                                            alignItems: "center", justifyContent: "center"
+                                                        }}>
+                                                            <img className="img-fluid" src={value.link} alt="preview" onLoad={() => {
+                                                                setFieldValue("file", true);
+                                                            }} />
+                                                        </label>
+                                                    </div>
+                                                )
+                                            })}
                                             <div className='col-xxl-1 col-xl-2 col-lg-4 col-md-5 col-sm-6 col-xs-6'>
                                                 <label htmlFor="file-upload-new" style={{
                                                     display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center"
                                                 }} onClick={(e) => {
                                                     document.getElementById('Modal_FileManager_Folder_open').click();
-                                                    // document.getElementById('Modal_FileManager_File_open').click();
                                                 }}>
                                                     <i className="fa fa-plus" aria-hidden="true" style={{ textAlign: "center", fontSize: "100px" }}></i>
                                                 </label>
@@ -145,7 +181,6 @@ const CreateProduct = ({ edit = false, data = null, onSubmit = null }) => {
                                                                 {(values.category_id === false) && setFieldValue("category_id", true)}
                                                                 <select value={category_id} className="form-control justify-content-center" style={{ direction: "rtl" }}
                                                                     onChange={(e) => {
-                                                                        console.log('d');
                                                                         setCategory_id(e.target.value);
                                                                         setFieldValue("category_id", true);
                                                                     }}>

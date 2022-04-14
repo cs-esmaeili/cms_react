@@ -3,7 +3,6 @@ import { getCookie } from "../../global/cookie";
 import Login from "./Login/Login";
 import Logout from "../components/modals/Logout";
 import ContentAndSidebar from "./partials/ContentAndSidebar";
-import RelogIn from './../components/modals/RelogIn';
 import { CheckToken } from "../../services/Authorization";
 
 
@@ -16,7 +15,6 @@ const Main = () => {
     const checkToken = async () => {
         try {
             const respons = await CheckToken();
-            console.log(respons);
             if (respons.data.statusText === "ok") {
                 return true;
             } else {
@@ -50,6 +48,10 @@ const Main = () => {
         };
 
     }, [update]);
+    useEffect(() => {
+        console.log(check);
+
+    }, [check]);
 
     return (
         <>
@@ -66,7 +68,6 @@ const Main = () => {
             {(check === true) &&
                 <div>
                     <div id="wrapper">
-                        <RelogIn />
                         <ContentAndSidebar />
                         <Logout update={() => setUpdate(!update)} />
                     </div>
