@@ -14,14 +14,12 @@ import PostList from './../../contents/PostList';
 import SiteIndex from './../../contents/SiteIndex';
 import CreateProduct from './../../contents/CreateProduct';
 import ProductList from './../../contents/ProductList';
-import RelogIn from './../../components/modals/RelogIn';
 
 const ContentWrapper = () => {
     return (
         <div id="content-wrapper" className="d-flex flex-column">
             <div id="content">
                 <Navbar />
-                <RelogIn />
                 <div className="container-fluid">
                     <PermissionDenid />
                     <Switch>

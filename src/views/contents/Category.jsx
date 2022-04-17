@@ -33,11 +33,9 @@ const Category = () => {
             }
         } catch (error) { }
     }
-    let stack = 1;
     const elements = (array) => {
         let outPut = [];
         let checker = () => array.every(v => Array.isArray(v));
-        stack++;
         for (let index = 0; index < array.length; index++) {
             let items = [];
             if (Array.isArray(array[index])) {
@@ -63,23 +61,11 @@ const Category = () => {
                 );
                 items = [...items, result];
             } else {
-                if (array === categoryPyramid) {
-                    let element =
-                        <div className="col-xl-3 col-lg-6 col-md-6 col-sm-12">
-                            <li key={generateID()} className="list-group-item d-flex justify-content-between">
-                                <i className="fa fa-trash" aria-hidden="true" onClick={() => deleteCategory(array[index].category_id)}></i>
-                                {array[index].name}
-                            </li >
-                        </div>;
-                    items = [...items, element];
-                } else {
-                    let element =
-                        <li key={generateID()} className="list-group-item d-flex justify-content-between">
-                            <i className="fa fa-trash" aria-hidden="true" onClick={() => deleteCategory(array[index].category_id)}></i>
-                            {array[index].name}
-                        </li >
-                    items = [...items, element];
-                }
+                let element = <li key={generateID()} className="list-group-item d-flex justify-content-between">
+                    <i className="fa fa-trash" aria-hidden="true" onClick={() => deleteCategory(array[index].category_id)}></i>
+                    {array[index].name}
+                </li >;
+                items = [...items, element];
             }
             outPut = [...outPut, items];
         }
@@ -114,10 +100,20 @@ const Category = () => {
             const respons = await _deleteCategory(data);
             if (respons.data.statusText === "ok") {
                 getCtegorysPyramid();
-                getCtegorysPure();
             }
             toast(respons.data.message);
         } catch (error) { }
+    }
+    const selectOptions = () => {
+        return (
+            <>
+                <option key={generateID() + ""} value="0">مجموعه جدید</option>
+                {
+                    categoryPure != null &&
+                    categoryPure.map(element => <option key={generateID() + ""} value={element.category_id}>{element.name}</option>)
+                }
+            </>
+        )
     }
 
     useEffect(() => {
