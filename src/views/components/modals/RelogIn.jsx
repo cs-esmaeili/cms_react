@@ -1,5 +1,5 @@
 import React from "react";
-import Modal from './../HOC/Modal';
+import Modal from '../HOC/Modal';
 import Login from '../../layouts/Login/Login';
 
 const RelogIn = () => {
