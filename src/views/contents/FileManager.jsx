@@ -111,7 +111,6 @@ const FileManager = ({ selectMode = null, data = null }) => {
                 if (respons.data.statusText === "ok") {
                     data({ folder: selectedItems[0], foler_path: currentPath + selectedItems[0] + '/', files: respons.data.list });
                     document.getElementById('Modal_FileManager_Folder_open').click();
-                    document.getElementById('Modal_EditProduct').style.overflowY = 'auto';
                 } else {
                     toast(respons.data.message);
                 }
@@ -121,7 +120,6 @@ const FileManager = ({ selectMode = null, data = null }) => {
         } else {
             data({ foler_path: currentPath + selectedItems[0] + '/', file: selectedItems[0] });
             document.getElementById('Modal_FileManager_Folder_open').click();
-
         }
     }
 
@@ -314,10 +312,7 @@ const FileManager = ({ selectMode = null, data = null }) => {
                         })
                     }
                     {(selectMode !== null) &&
-                        <button className="btn btn-primary btn-user btn-block" onClick={() => {
-                            handelSelect();
-
-                        }}>
+                        <button className="btn btn-primary btn-user btn-block" onClick={() => handelSelect()}>
                             انتخاب
                         </button>
                     }
